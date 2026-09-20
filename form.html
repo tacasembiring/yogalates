@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0d1a" />
+  <title>Yogalates · Daftar</title>
+  <meta name="description" content="Daftar kelas Yogalates. Breathe. Move. Flow." />
+  <style>
+    :root {
+      --bg: #0b0d1a;
+      --ink: #f4f1ec;
+      --muted: rgba(244, 241, 236, 0.62);
+      --line: rgba(255, 255, 255, 0.14);
+      --c1: #ff7a59;
+      --c2: #ff477e;
+      --c3: #ffb26b;
+      --c4: #7b8cff;
+      --ring: rgba(255, 122, 89, 0.45);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100dvh;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+      padding: max(28px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* animated gradient mesh (matches landing page) */
+    .mesh { position: fixed; inset: -20%; z-index: 0; filter: blur(70px) saturate(1.15); opacity: 0.85; pointer-events: none; }
+    .blob { position: absolute; border-radius: 50%; mix-blend-mode: screen; will-change: transform; }
+    .blob.b1 { width: 46vmax; height: 46vmax; left: -10%; top: -14%; background: radial-gradient(circle at 30% 30%, var(--c1), transparent 62%); animation: d1 24s var(--ease) infinite alternate; }
+    .blob.b2 { width: 42vmax; height: 42vmax; right: -12%; top: 2%; background: radial-gradient(circle at 60% 40%, var(--c2), transparent 60%); animation: d2 28s var(--ease) infinite alternate; }
+    .blob.b3 { width: 40vmax; height: 40vmax; left: 20%; bottom: -20%; background: radial-gradient(circle at 50% 50%, var(--c4), transparent 60%); animation: d3 32s var(--ease) infinite alternate; }
+    @keyframes d1 { to { transform: translate3d(8%, 10%, 0) scale(1.15); } }
+    @keyframes d2 { to { transform: translate3d(-10%, 6%, 0) scale(1.1); } }
+    @keyframes d3 { to { transform: translate3d(6%, -8%, 0) scale(1.2); } }
+    .vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background: radial-gradient(120% 120% at 50% 30%, transparent 42%, rgba(6,7,16,0.6) 100%); }
+
+    /* card */
+    .card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 480px;
+      background: rgba(18, 20, 40, 0.62);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: clamp(24px, 5vw, 38px);
+      backdrop-filter: blur(18px) saturate(1.2);
+      -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 0.9s var(--ease) 0.1s forwards;
+    }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    .brand { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .brand .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c1); box-shadow: 0 0 10px var(--c1); }
+
+    h1 { font-size: clamp(26px, 7vw, 36px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+    h1 .grad { background: linear-gradient(100deg, var(--c3), var(--c2) 50%, var(--c1)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .lead { color: var(--muted); font-size: 14px; line-height: 1.55; margin-top: 8px; }
+    .req-note { color: var(--c2); font-size: 12px; margin-top: 10px; }
+
+    /* live quota banner */
+    .quota {
+      margin-top: 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      transition: border-color 0.3s var(--ease), background 0.3s var(--ease), color 0.3s var(--ease);
+    }
+    .quota .qhead { font-weight: 700; color: var(--ink); display: block; margin-bottom: 2px; }
+    .quota.full { border-color: var(--c2); background: rgba(255,71,126,0.12); color: var(--ink); }
+    .quota .dotlive { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #8affb0; box-shadow: 0 0 8px #8affb0; margin-right: 6px; vertical-align: 1px; animation: blink 2s ease-in-out infinite; }
+    .quota.full .dotlive { background: var(--c2); box-shadow: 0 0 8px var(--c2); }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+    /* smoothly collapse the payment field when class is full */
+    .field.collapsible { overflow: hidden; transition: max-height 0.4s var(--ease), opacity 0.3s var(--ease), margin 0.3s var(--ease); max-height: 400px; }
+    .field.collapsible.hidden { max-height: 0; opacity: 0; margin: 0; pointer-events: none; }
+
+    form { margin-top: 22px; display: flex; flex-direction: column; gap: 20px; }
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    label.q { font-size: 15px; font-weight: 600; }
+    label.q .star, .q .star { color: var(--c2); margin-left: 3px; }
+    .hint { font-size: 12px; color: var(--muted); }
+
+    input[type="email"], input[type="text"] {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 13px 14px;
+      color: var(--ink);
+      font: inherit;
+      font-size: 15px;
+      transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease);
+    }
+    input::placeholder { color: rgba(244,241,236,0.35); }
+    input:focus { outline: none; border-color: var(--c1); box-shadow: 0 0 0 3px var(--ring); background: rgba(255,255,255,0.08); }
+
+    /* radio group */
+    .choices { display: flex; flex-direction: column; gap: 10px; }
+    .choice {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+      user-select: none;
+    }
+    .choice:hover { background: rgba(255,255,255,0.05); }
+    .choice input { accent-color: var(--c1); width: 18px; height: 18px; flex-shrink: 0; }
+    .choice:has(input:checked) { border-color: var(--c1); background: rgba(255,122,89,0.12); }
+
+    /* file upload */
+    .drop {
+      position: relative;
+      border: 1.5px dashed var(--line);
+      border-radius: 14px;
+      padding: 22px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+    }
+    .drop:hover, .drop.dragover { border-color: var(--c1); background: rgba(255,122,89,0.08); }
+    .drop input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .drop .icon { font-size: 22px; }
+    .drop .dtitle { font-size: 14px; font-weight: 600; margin-top: 6px; }
+    .drop .dsub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .preview { display: none; margin-top: 12px; align-items: center; gap: 12px; }
+    .preview.show { display: flex; }
+    .preview img { width: 52px; height: 52px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
+    .preview .pname { font-size: 13px; word-break: break-all; }
+    .preview .psize { font-size: 12px; color: var(--muted); }
+
+    /* submit */
+    .submit {
+      position: relative;
+      margin-top: 6px;
+      border: none;
+      cursor: pointer;
+      font: inherit; font-weight: 700; font-size: 16px;
+      color: #1a1204;
+      padding: 15px 24px;
+      border-radius: 999px;
+      background: linear-gradient(100deg, var(--c3), var(--c1) 55%, var(--c2));
+      background-size: 180% auto;
+      box-shadow: 0 10px 30px rgba(255,100,90,0.32);
+      transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), background-position 0.5s var(--ease), opacity 0.3s;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+      overflow: hidden;
+    }
+    .submit:hover:not(:disabled) { transform: translateY(-2px); background-position: 100% center; box-shadow: 0 16px 40px rgba(255,100,90,0.45); }
+    .submit:active:not(:disabled) { transform: translateY(0) scale(0.99); }
+    .submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* secondary "back" button */
+    .back {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      margin-top: 2px;
+      font: inherit; font-weight: 600; font-size: 15px;
+      color: var(--muted);
+      padding: 13px 24px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: transparent;
+      cursor: pointer;
+      transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    .back:hover { color: var(--ink); border-color: var(--c1); background: rgba(255,255,255,0.04); }
+    .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(26,18,4,0.35); border-top-color: #1a1204; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: -3px; margin-right: 8px; }
+    .submit.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .msg { font-size: 13px; line-height: 1.5; margin-top: 4px; min-height: 18px; }
+    .msg.err { color: #ff8a8a; }
+    .msg.ok { color: #8affb0; }
+
+    /* success state */
+    .done { text-align: center; padding: 10px 0; display: none; }
+    .done.show { display: block; animation: fadeUp 0.6s var(--ease) forwards; }
+    .done .check { width: 68px; height: 68px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(120deg, var(--c3), var(--c1)); display: grid; place-items: center; font-size: 34px; color: #1a1204; box-shadow: 0 0 40px var(--ring); }
+    .done h2 { font-size: 24px; font-weight: 800; }
+    .done p { color: var(--muted); font-size: 14px; margin-top: 8px; }
+    .done a { color: var(--c3); text-decoration: none; font-weight: 600; display: inline-block; margin-top: 18px; }
+    .done a:hover { text-decoration: underline; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+  </div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <main class="card">
+    <!-- FORM VIEW -->
+    <div id="formView">
+      <span class="brand"><span class="dot"></span> breathe · move · flow</span>
+      <h1>Yoga<span class="grad">lates</span> Form</h1>
+      <p class="lead">Isi data di bawah untuk mendaftar kelas. Pastikan bukti pembayaran sudah siap ya. 🧘</p>
+      <p class="req-note">* Wajib diisi</p>
+
+      <div class="quota" id="quota"><span class="qhead"><span class="dotlive"></span>Memuat kuota…</span>Mengecek ketersediaan kelas.</div>
+
+      <form id="regForm" novalidate>
+        <div class="field">
+          <label class="q" for="email">Email<span class="star">*</span></label>
+          <input type="email" id="email" name="email" placeholder="nama@email.com" autocomplete="email" required />
+        </div>
+
+        <div class="field">
+          <label class="q" for="seatalks">Seatalks<span class="star">*</span></label>
+          <span class="hint">Username Seatalks kamu</span>
+          <input type="text" id="seatalks" name="seatalks" placeholder="@username" required />
+        </div>
+
+        <div class="field">
+          <span class="q">Sewa Mat?<span class="star">*</span></span>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="sewaMat" value="Ya" required /> <span>Ya</span></label>
+            <label class="choice"><input type="radio" name="sewaMat" value="Tidak" /> <span>Tidak</span></label>
+          </div>
+        </div>
+
+        <div class="field collapsible" id="buktiField">
+          <span class="q">Bukti Pembayaran<span class="star">*</span></span>
+          <span class="hint">Upload 1 gambar. Maks 10 MB.</span>
+          <div class="drop" id="drop">
+            <div class="icon">📷</div>
+            <div class="dtitle">Ketuk untuk pilih gambar</div>
+            <div class="dsub">atau seret &amp; lepas di sini</div>
+            <input type="file" id="bukti" name="bukti" accept="image/*" required />
+          </div>
+          <div class="preview" id="preview">
+            <img id="previewImg" alt="preview" />
+            <div>
+              <div class="pname" id="previewName"></div>
+              <div class="psize" id="previewSize"></div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="submit" id="submitBtn">
+          <span class="spinner"></span><span class="label">Kirim Pendaftaran</span>
+        </button>
+        <a href="index.html" class="back">← Kembali</a>
+        <div class="msg" id="msg" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+
+    <!-- SUCCESS VIEW -->
+    <div class="done" id="doneView">
+      <div class="check">✓</div>
+      <h2 id="doneTitle">Terima kasih!</h2>
+      <p id="doneMsg">Pendaftaran kamu sudah kami terima. Sampai jumpa di atas matras. 🙏</p>
+      <a href="index.html">← Kembali ke beranda</a>
+    </div>
+  </main>
+
+  <script>
+    // ============================================================
+    // CONFIG — paste your deployed Apps Script Web App /exec URL here
+    // (the same script that contains Code.gs / doPost)
+    // ============================================================
+    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwlyOYefrhKdLgf1wlldajRZoBo1TXr5Tw640te1b13jvwgMQm0IpHQLXoHo7tQBYNf_g/exec';
+    var MAX_BYTES = 15 * 1024 * 1024; // 15 MB
+
+    var form = document.getElementById('regForm');
+    var fileInput = document.getElementById('bukti');
+    var drop = document.getElementById('drop');
+    var preview = document.getElementById('preview');
+    var previewImg = document.getElementById('previewImg');
+    var previewName = document.getElementById('previewName');
+    var previewSize = document.getElementById('previewSize');
+    var msg = document.getElementById('msg');
+    var submitBtn = document.getElementById('submitBtn');
+    var quota = document.getElementById('quota');
+    var buktiField = document.getElementById('buktiField');
+    var selectedFile = null;
+    var isFull = false; // class full => waitlist mode (no payment proof needed)
+
+    // ---- poll registration capacity every 2s ----
+    function applyStatus(data) {
+      if (!data || typeof data.registered === 'undefined') return;
+      isFull = !!data.full;
+      var left = Math.max(0, (data.max || 0) - (data.registered || 0));
+      console.log('[quota] max:', data.max, '| current:', data.registered, '| left:', left, '| full:', isFull);
+
+      if (isFull) {
+        quota.className = 'quota full';
+        quota.innerHTML = '<span class="qhead"><span class="dotlive"></span>Kuota penuh</span>' +
+          'Pendaftaran akan masuk <strong>waitlist</strong>. Kamu tetap bisa daftar, tanpa perlu bukti pembayaran.';
+        buktiField.classList.add('hidden');
+      } else {
+        quota.className = 'quota';
+        quota.innerHTML = '<span class="qhead"><span class="dotlive"></span>Kuota tersedia</span>' +
+          'Sisa <strong>' + left + '</strong> dari ' + (data.max || 0) + ' slot. Daftar sekarang selagi ada tempat!';
+        buktiField.classList.remove('hidden');
+      }
+
+      // keep the submit label in sync (but never while a submit is in flight)
+      if (!submitBtn.disabled) {
+        submitBtn.querySelector('.label').textContent = isFull ? 'Gabung Waitlist' : 'Kirim Pendaftaran';
+      }
+    }
+
+    function refreshStatus() {
+      fetch(ENDPOINT, { method: 'GET' })
+        .then(function (r) { return r.json(); })
+        .then(applyStatus)
+        .catch(function (err) { console.warn('status poll failed', err); });
+    }
+    refreshStatus();
+    var pollTimer = setInterval(refreshStatus, 2000);
+
+    function fmtSize(b) {
+      if (b < 1024) return b + ' B';
+      if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+      return (b / 1048576).toFixed(2) + ' MB';
+    }
+    function setMsg(text, kind) { msg.textContent = text || ''; msg.className = 'msg' + (kind ? ' ' + kind : ''); }
+
+    function showDone(status) {
+      var title = document.getElementById('doneTitle');
+      var body = document.getElementById('doneMsg');
+      if (String(status).toLowerCase() === 'waitlist') {
+        title.textContent = 'Kamu masuk Waitlist 📝';
+        body.textContent = 'Kuota kelas sudah penuh, jadi kamu kami masukkan ke daftar tunggu. Kami akan menghubungi kalau ada slot kosong. 🙏';
+      } else {
+        title.textContent = 'Terima kasih!';
+        body.textContent = 'Pendaftaran kamu sudah kami terima. Sampai jumpa di atas matras. 🙏';
+      }
+      document.getElementById('formView').style.display = 'none';
+      document.getElementById('doneView').classList.add('show');
+    }
+
+    // ---- file selection + preview ----
+    function handleFile(file) {
+      if (!file) return;
+      if (!/^image\//.test(file.type)) { setMsg('File harus berupa gambar.', 'err'); fileInput.value = ''; selectedFile = null; preview.classList.remove('show'); return; }
+      if (file.size > MAX_BYTES) { setMsg('Ukuran gambar melebihi 10 MB.', 'err'); fileInput.value = ''; selectedFile = null; preview.classList.remove('show'); return; }
+      selectedFile = file;
+      setMsg('');
+      previewName.textContent = file.name;
+      previewSize.textContent = fmtSize(file.size);
+      var reader = new FileReader();
+      reader.onload = function (e) { previewImg.src = e.target.result; preview.classList.add('show'); };
+      reader.readAsDataURL(file);
+    }
+    fileInput.addEventListener('change', function () { handleFile(fileInput.files[0]); });
+    ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('dragover'); }); });
+    ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('dragover'); }); });
+    drop.addEventListener('drop', function (e) { if (e.dataTransfer.files[0]) { fileInput.files = e.dataTransfer.files; handleFile(e.dataTransfer.files[0]); } });
+
+    // ---- read file as base64 (strip data: prefix) ----
+    function toBase64(file) {
+      return new Promise(function (resolve, reject) {
+        var r = new FileReader();
+        r.onload = function () { resolve(String(r.result).split(',')[1]); };
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+    }
+
+    // ---- submit ----
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      setMsg('');
+
+      var email = document.getElementById('email').value.trim();
+      var seatalks = document.getElementById('seatalks').value.trim();
+      var sewaEl = form.querySelector('input[name="sewaMat"]:checked');
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('Masukkan email yang valid.', 'err'); return; }
+      if (!seatalks) { setMsg('Isi username Seatalks kamu.', 'err'); return; }
+      if (!sewaEl) { setMsg('Pilih opsi Sewa Mat.', 'err'); return; }
+      // bukti pembayaran only required when there are still open slots
+      if (!isFull && !selectedFile) { setMsg('Upload bukti pembayaran.', 'err'); return; }
+
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+      submitBtn.querySelector('.label').textContent = 'Mengirim…';
+
+      // attach the file only if one was selected (waitlist mode has none)
+      var filePromise = selectedFile ? toBase64(selectedFile) : Promise.resolve(null);
+
+      filePromise.then(function (b64) {
+        var body = new URLSearchParams();
+        body.append('email', email);
+        body.append('seatalks', seatalks);
+        body.append('sewaMat', sewaEl.value);
+        if (b64) {
+          body.append('fileName', selectedFile.name);
+          body.append('mimeType', selectedFile.type);
+          body.append('fileData', b64);
+        }
+
+        // form-urlencoded => "simple" request => no CORS preflight
+        return fetch(ENDPOINT, { method: 'POST', body: body });
+      }).then(function (res) {
+        return res.json().catch(function () { return { result: 'success' }; });
+      }).then(function (data) {
+        if (data && data.result === 'error') throw new Error(data.message || 'Gagal menyimpan.');
+        clearInterval(pollTimer);
+        showDone(data && data.status);
+      }).catch(function (err) {
+        console.error(err);
+        setMsg('Maaf, pengiriman gagal. Coba lagi ya. (' + err.message + ')', 'err');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+        submitBtn.querySelector('.label').textContent = 'Kirim Pendaftaran';
+      });
+    });
+  </script>
+</body>
+</html>
